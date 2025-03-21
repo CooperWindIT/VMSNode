@@ -1,0 +1,158 @@
+USE [QAVMS1]
+GO
+/****** Object:  Table [dbo].[ScreenOperations]    Script Date: 3/19/2025 10:08:36 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[ScreenOperations](
+	[Id] [int] NOT NULL,
+	[TableName] [varchar](50) NOT NULL,
+	[OpText] [varchar](15) NOT NULL,
+	[SQLQuery] [varchar](max) NULL,
+	[IsActive] [bit] NOT NULL,
+ CONSTRAINT [PK_ScreenOperations] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (1, N'USERS', N'SIGNIN', N'
+				SELECT 
+     US.*, 
+    RL.Name AS RoleName, 
+     MenuPath
+FROM dbo.Users US 
+INNER JOIN dbo.Roles RL ON RL.Id = US.RoleId
+INNER JOIN dbo.RoleMenu RM ON RM.RoleId = RL.Id  -- Properly joining RoleMenu with Roles
+INNER JOIN dbo.AppMenu AM ON AM.Id = RM.AppMenuId
+WHERE Us.Name = ''@UserName''  and Us.Password = ''@Password'' 
+AND US.IsActive = 1 AND RM.IsActive = 1;', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (2, N'requestPass', N'GETREQPASS', N'
+  select RequestId, VisitorName, RequestDate, MeetingDate, NoOfMembers, VisitorType, 
+  Status,  AutoIncNo, VehicleInfo, Email, Mobile, Remarks from dbo.requestPass
+  where OrgId = @OrgId AND IsActive = 1
+  ORDER BY RequestId DESC', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (3, N'requestPass', N'GETREQPASSBYID', N'select  RequestDate,MeetingDate,MeetingTime,Remarks AS VisitorsRemarks ,VisitorType, Status, AutoIncNo ,  
+AD.*    from dbo.VisitorsPass as RP LEFT JOIN      dbo.VisitorsDetails AS AD ON RP.RequestId = AD.RequestId    
+where RP.RequestId = @Requestid AND (RP.IsActive = 1 OR AD.IsActive = 1)', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (4, N'AttendeDetails', N'ADETAIL', N'update dbo.VisitorsDetails SET IsActive = 0 , updatedBy = @UserId ,  UpdatedOn = dbo.GetISTTime()  where Id = @AttendeId', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (5, N'Contractors', N'CONTINSRT', N'
+INSERT INTO dbo.Contractor   (ContractorName,  PhoneNumber, Email,
+IsActive,  CreatedBy, CreatedOn, OrgId)
+VALUES  (''@ContractorName'',  ''@PhoneNumber'',  ''@Email'', 1, @UserId,  dbo.GetISTTime(), @OrgId)', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (6, N'Contractors', N'GETCONTRACT', N'SELECT       C.Id,C.ContractorName,      C.PhoneNumber,      C.Email,   
+  (SELECT COUNT(*)        FROM dbo.CasualLabours CL        WHERE CL.ContractorId = C.Id AND CL.IsActive = 1) AS CLCount 
+  FROM dbo.Contractor C  WHERE C.OrgId = @OrgId AND C.IsActive = 1;', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (7, N'LaborQRPass', N'GETQRPASS', N'select * from dbo.LaborQRPass where ContractorId = @ContractorId AND IsActive = 1', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (8, N'ShiftTimings', N'GETSHFTTIMES', N'select * from dbo.ShiftTimings where OrgId = @OrgId AND IsActive = 1', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (9, N'Contractors', N'UPDTCONTRACT', N'
+UPDATE dbo.Contractor
+SET ContractorName = ''@ContractorName'',  
+PhoneNumber = ''@PhoneNumber'', Email = ''@Email'',   
+UpdatedBy = @UpdatedBy, UpdatedOn = dbo.GetISTTime(), OrgId = @OrgId   where Id = @Id', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (10, N'Users', N'ADDUSER', N'
+  INSERT INTO dbo.Users   (RoleId, Name, Password, IsActive, CreatedBy, CreatedOn, OrgId, Mobile, Email, IsMobile, Gender, ManagerId)   
+  VALUES   (@RoleId, ''@Name'', ''@Password'', @IsActive, @CreatedBy, dbo.GetISTTime(), @OrgId, ''@Mobile'', ''@Email'', @IsMobile, @Gender, @ManagerId)', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (11, N'Users', N'UPDTUSER', N'
+  UPDATE dbo.Users     
+  SET       RoleId = @RoleId,      Name = ''@Name'',    Password = ''@Password'', 
+  IsActive = @IsActive,    UpdatedBy = @UpdatedBy,      UpdatedOn = dbo.GetISTTime(),  
+  OrgId = @OrgId,      Mobile = ''@Mobile'',      Email = ''@Email'',   IsMobile = @IsMobile, 
+  Gender = @Gender, ManagerId = @ManagerId    WHERE Id = @Id', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (12, N'RequestPass', N'MOMSUBMIT', N'
+		update dbo.RequestPass SET MOM = ''@MOM'',  
+		UpdatedBy = @UpdatedBy, UpdatedOn = dbo.GetISTTime() 
+		where RequestId = @RequestId', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (13, N'Users', N'GETUSERS', N'SELECT US.*,RO.Name AS RoleName FROM  dbo.Users US 
+INNER JOIN dbo.Roles RO ON RO.Id = US.RoleId 
+WHERE US.OrgId = @OrgId AND US.IsActive = 1;', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (14, N'Users', N'DELTUSER', N'UPDATE dbo.Users 
+SET 
+    IsActive = 0,
+    UpdatedBy = @UpdatedBy,
+    UpdatedOn = dbo.GetISTTime()
+WHERE Id = @Id', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (15, N'RequestPass', N'PASSCHECKIN', N'update dbo.RequestPass  SET CheckInTime = ''@CheckInTime'', UpdatedBy = @UpdatedBy, 
+UpdatedOn = dbo.GetISTTime() where RequestId = @RequestId', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (16, N'RequestPass', N'PASSCHECKOUT', N'
+	 update dbo.VisitorsPass SET CheckOutTime = ''@checkOutTime'', 
+	 UpdatedBy = @UpdatedBy, UpdatedOn = dbo.GetISTTime() where RequestId = @RequestId AND Id = @VisitorId
+	 ', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (17, N'LaborQRPass', N'QRCHECKIN', N'
+insert into dbo.LaborQRPass (ContractorId, CheckIn, Date, IsActive, CreatedBy, CreatedOn, OrgId, CLId)
+VALUES 
+(@ContractorId, ''@CheckIn'', ''@Date'', 1, @UserId, dbo.GetISTTime(), @OrgId, @CLId)', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (18, N'LaborQRPass', N'QRCHECKOUT', N'
+UPDATE dbo.LaborQRPass
+SET     CheckOut  = ''@CheckOut'', UpdatedBy = @UpdatedBy, 
+UpdatedOn = dbo.GetISTTime()
+where  Id = @PassId', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (19, N'Roles', N'GETROLES', N'select * from dbo.Roles where OrgId = @OrgId and IsActive = 1', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (20, N'SP_GetRoleSecurity', N'RSECURSEL', N'exec [SP_GetRoleSecurity] @OrgId, @RoleId , @ModuleId', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (21, N'AppReports', N'GETREPORTHEAD', N'SELECT ReportFilter,ReportTitle from dbo.AppReports Where Id = @ReportId', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (24, N'Department', N'GETDEPT', N'select Id,DeptName from dbo.Departments where IsActive = 1 AND OrgId = @OrgId', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (25, N'VisitorsPass', N'REJECT', N'update dbo.VisitorsPass SET Status = ''REJECTED'', 
+  UpdatedBy = @UpdatedBy, UpdatedOn = dbo.GetISTTime()   where RequestId = @RequestId
+', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (26, N'Users', N'GETMANAGER', N'select * from dbo.Users where RoleId = 5 AND  IsActive = 1 AND OrgId = @OrgId', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (27, N'CasualLabours', N'INSRTCLS', N'INSERT INTO dbo.CasualLabours (ContractorId, Name, PhoneNumber, ShiftTypeId, ValidStartDt, ValidEndDt, IsActive, CreatedBy, CreatedOn) 
+ VALUES (@ContractorId, @Name, @PhoneNumber, @ShiftTypeId, @ValidStartDt, @ValidEndDt, @IsActive, @CreatedBy, dbo.GetISTTime())', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (28, N'CasualLabours', N'UPDTCLS', N'UPDATE dbo.CasualLabours 
+ SET ContractorId = @ContractorId, 
+     Name = @Name, 
+     PhoneNumber = @PhoneNumber, 
+     ShiftTypeId = @ShiftTypeId, 
+     ValidStartDt = @ValidStartDt, 
+     ValidEndDt = @ValidEndDt, 
+     IsActive = @IsActive, 
+     UpdatedBy = @UpdatedBy, 
+     UpdatedOn = dbo.GetISTTime() 
+ WHERE Id = @Id', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (29, N'CasualLabours', N'GETCLS', N'
+select CL.*,ST.ShiftName from dbo.CasualLabours CL INNER JOIN 
+dbo.ShiftTimings ST ON ST.Id = CL.ShiftTypeId
+where ContractorId = @ContractorId AND CL.IsActive = 1', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (30, N'CasualLabours', N'GetCLSById', N'SELECT CL.ContractorId,LP.Id PassId,Name AS CLName,CheckIn,CheckOut
+FROM dbo.CasualLabours CL 
+INNER JOIN dbo.ShiftTimings ST ON ST.Id = CL.ShiftTypeId
+LEFT JOIN dbo.LaborQRPass LP ON LP.CLId = CL.Id
+WHERE CL.ContractorId = @ContractorId AND CL.OrgId = @OrgId
+AND GETDATE() BETWEEN CL.ValidStartDt AND CL.ValidEndDt
+AND CAST(GETDATE() AS TIME) BETWEEN ST.StartTime AND ST.EndTime
+AND checkIn IS NULL 
+OR CheckOut IS NULL', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (31, N'RoleMenu', N'DELTROLMNU', N'update dbo.RoleMenu set IsActive = 0  where RoleId = @RoleId AND AppMenuId = @MenuId AND OrgId = @OrgId', 1)
+GO
+INSERT [dbo].[ScreenOperations] ([Id], [TableName], [OpText], [SQLQuery], [IsActive]) VALUES (32, N'CasualLabours', N'DELTCLS', N'update dbo.CasualLabours SET IsActive = 0 where Id = @Id', 1)
+GO
+ALTER TABLE [dbo].[ScreenOperations] ADD  DEFAULT ((1)) FOR [IsActive]
+GO

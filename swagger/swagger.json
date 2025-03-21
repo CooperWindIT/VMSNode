@@ -1,0 +1,731 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "VMS API",
+      "version": "1.0.0",
+      "description": "This Swagger documentation provides a detailed API reference for the Visitor Management System, enabling seamless integration of visitor entry and exit workflows. It covers endpoints for security, employees, HR, and superadmin roles, facilitating pre-booking, QR code generation, approvals, tracking, and reporting functionalities. Additionally, it includes features for automated email notifications, role-based access control, and comprehensive visitor tracking."
+    },
+    "paths": {
+      "/api/auth/send-email": {
+        "post": {
+          "tags": ["Email"],
+          "summary": "Send an email",
+          "description": "Sends an email with the specified details.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "to": {
+                      "type": "string",
+                      "example": "saipavan861@gmail.com",
+                      "description": "Recipient email address"
+                    },
+                    "subject": {
+                      "type": "string",
+                      "example": "Test Email",
+                      "description": "Subject of the email"
+                    },
+                    "text": {
+                      "type": "string",
+                      "example": "Text",
+                      "description": "Plain text content of the email"
+                    },
+                    "html": {
+                      "type": "string",
+                      "example": "<h1>Hello Pavan</h1>",
+                      "description": "HTML content of the email"
+                    }
+                  },
+                  "required": ["to", "subject"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Email sent successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Email sent successfully"
+                      },
+                      "info": {
+                        "type": "string",
+                        "example": "250 2.0.0 OK"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Error while sending email",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Error while sending email"
+                      },
+                      "error": {
+                        "type": "string",
+                        "example": "Authentication error"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/auth/signin": {
+        "get": {
+          "tags": ["Authentication"],
+          "summary": "User SignIn",
+          "description": "Signs in the user using the provided email and password.",
+          "parameters": [
+            {
+              "name": "Email",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "example": "yaswanthpg9@gmail.com",
+                "description": "User's email address"
+              }
+            },
+            {
+              "name": "Password",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "string",
+                "example": "VMS123",
+                "description": "User's password"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Sign-in successful",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Sign-in successful"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            
+            
+          }
+        }
+      },
+      "/api/auth/ManageRequestPass": {
+        "post": {
+          "tags": ["Request Pass"],
+          "summary": "Manage request pass (ADD or EDIT)",
+          "description": "This endpoint allows users to add or edit request passes and attendee details.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "orgid": {
+                      "type": "integer",
+                      "example": 9333,
+                      "description": "The organization ID"
+                    },
+                    "userid": {
+                      "type": "integer",
+                      "example": 1,
+                      "description": "The user ID initiating the request"
+                    },
+                    "Operation": {
+                      "type": "string",
+                      "enum": ["ADD", "EDIT"],
+                      "example": "ADD",
+                      "description": "Operation type: ADD for new pass, EDIT for updating an existing pass"
+                    },
+                    "RequestPass": {
+                      "type": "object",
+                      "properties": {
+                        "VisitorName": {
+                          "type": "string",
+                          "example": "VIKRAM",
+                          "description": "Name of the visitor"
+                        },
+                        "Email": {
+                          "type": "string",
+                          "example": "VIKRAM@gmail.com",
+                          "description": "Email address of the visitor"
+                        },
+                        "Mobile": {
+                          "type": "string",
+                          "example": "0000000000",
+                          "description": "Mobile number of the visitor"
+                        },
+                        "CompanyName": {
+                          "type": "string",
+                          "example": "HERO Corp",
+                          "description": "Company name the visitor represents"
+                        },
+                        "RequestDate": {
+                          "type": "string",
+                          "example": "2024-11-22",
+                          "description": "The date the request is made"
+                        },
+                        "MeetingDate": {
+                          "type": "string",
+                          "example": "2024-11-23",
+                          "description": "The date the meeting is scheduled"
+                        },
+                        "IsVehicle": {
+                          "type": "boolean",
+                          "example": true,
+                          "description": "Indicates if the visitor will bring a vehicle"
+                        },
+                        "VehicleInfo": {
+                          "type": "string",
+                          "example": "Car - AB123CD",
+                          "description": "Vehicle information if the visitor is bringing a vehicle"
+                        },
+                        "ReturnOfMaterials": {
+                          "type": "string",
+                          "example": "Laptop",
+                          "description": "Details of materials the visitor is bringing"
+                        },
+                        "Remarks": {
+                          "type": "string",
+                          "example": "Urgent meeting",
+                          "description": "Any additional remarks for the visit"
+                        },
+                        "NoOfMembers": {
+                          "type": "integer",
+                          "example": 2,
+                          "description": "Number of members accompanying the visitor"
+                        },
+                        "VisitorType": {
+                          "type": "string",
+                          "example": 1,
+                          "description": "Type of visitor"
+                        },
+                        "Status": {
+                          "type": "string",
+                          "example": "DRAFT",
+                          "description": "Status of the request"
+                        },
+                        "IsActive": {
+                          "type": "integer",
+                          "example": 1,
+                          "description": "Whether the request is active"
+                        }
+                      },
+                      "required": ["VisitorName", "Email", "Mobile"]
+                    },
+                    "Attendees": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "AttendeName": {
+                            "type": "string",
+                            "example": "MEM1",
+                            "description": "Name of the attendee"
+                          },
+                          "PhoneNumber": {
+                            "type": "string",
+                            "example": "0000000000",
+                            "description": "Phone number of the attendee"
+                          },
+                          "Email": {
+                            "type": "string",
+                            "example": "MEM1@gmail.com",
+                            "description": "Email address of the attendee"
+                          },
+                          "Remarks": {
+                            "type": "string",
+                            "example": "Colleague",
+                            "description": "Remarks about the attendee"
+                          }
+                        }
+                      },
+                      "description": "List of attendees associated with the request pass"
+                    }
+                  },
+                  "required": ["orgid", "userid", "Operation", "RequestPass"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Request pass successfully managed (added or edited)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Request pass successfully managed"
+                      },
+                      "status": {
+                        "type": "string",
+                        "example": "Success"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid request data",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Error: Missing required fields"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "500": {
+              "description": "Server error while processing the request",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Error while managing the request pass"
+                      },
+                      "error": {
+                        "type": "string",
+                        "example": "Database connection failed"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/contractor/ManageLaborQRPass": {
+        "post": {
+          "tags": ["Labor QR Pass"],
+          "summary": "Manage labor QR pass (Check-in or Check-out)",
+          "description": "This endpoint allows users to manage labor QR pass activities such as Check-in or Check-out based on the given time and date.",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "orgid": {
+                      "type": "integer",
+                      "example": 9333,
+                      "description": "The organization ID"
+                    },
+                    "userid": {
+                      "type": "integer",
+                      "example": 1,
+                      "description": "The user ID initiating the request"
+                    },
+                    "Time": {
+                      "type": "string",
+                      "format": "time",
+                      "example": "08:30:00",
+                      "description": "The time of Check-in or Check-out"
+                    },
+                    "Date": {
+                      "type": "string",
+                      "format": "date",
+                      "example": "2024-11-28",
+                      "description": "The date of the operation"
+                    },
+                    "QRCode": {
+                      "type": "string",
+                      "example": "QR001",
+                      "description": "QR code of the labor"
+                    },
+                    "ContractorId": {
+                      "type": "integer",
+                      "example": 1,
+                      "description": "The contractor ID"
+                    }
+                  },
+                  "required": ["orgid", "userid", "Time", "Date", "QRCode", "ContractorId"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Labor QR pass successfully managed (Check-in or Check-out)",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Check-in/Check-out recorded successfully"
+                      },
+                      "status": {
+                        "type": "string",
+                        "example": "Success"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            
+            
+          
+          }
+        }
+      },
+      "/api/auth/getReqPass": {
+        "get": {
+          "tags": ["Request Pass"],
+          "summary": "Get request passes by organization ID",
+          "description": "Retrieves the list of request passes for a given organization.",
+          "parameters": [
+            {
+              "name": "OrgId",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "example": 1,
+                "description": "The organization ID to filter request passes"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successfully retrieved request passes",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "VisitorName": {
+                          "type": "string",
+                          "example": "John Doe",
+                          "description": "Name of the visitor"
+                        },
+                        "Email": {
+                          "type": "string",
+                          "example": "johndoe@example.com",
+                          "description": "Email address of the visitor"
+                        },
+                        "Mobile": {
+                          "type": "string",
+                          "example": "9876543210",
+                          "description": "Mobile number of the visitor"
+                        },
+                        "CompanyName": {
+                          "type": "string",
+                          "example": "ABC Corp",
+                          "description": "Company name the visitor represents"
+                        },
+                        "RequestDate": {
+                          "type": "string",
+                          "example": "2024-11-22",
+                          "description": "The date the request is made"
+                        },
+                        "MeetingDate": {
+                          "type": "string",
+                          "example": "2024-11-23",
+                          "description": "The date the meeting is scheduled"
+                        },
+                        "Status": {
+                          "type": "string",
+                          "example": "Pending",
+                          "description": "Status of the request pass"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/auth/getReqPassById": {
+        "get": {
+          "tags": ["Request Pass"],
+          "summary": "Get requestPassAttendeDetails  by RequestId ",
+          "description": "Retrieves the list of request passes for a given organization.",
+          "parameters": [
+            {
+              "name": "RequestId",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "example": 1,
+                "description": "The RequestId to get singlerecorddata "
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successfully retrieved request passes",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/auth/PassApproval&Email": {
+        "post": {
+    "tags": ["PassApproval&Email"],
+    "summary": "Approve Pass and Send Email",
+    "description": "Updates the status of a pass request and optionally sends an email if the status is 'Approve'.",
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "RequestId": {
+                "type": "string",
+                "example": 1,
+                "description": "The unique ID of the request"
+              },
+              "Status": {
+                "type": "string",
+                "example": "Approve",
+                "description": "The status to update (e.g., 'Approve', 'Reject')"
+              },
+              "UserId": {
+                "type": "string",
+                "example": 1,
+                "description": "ID of the user updating the status"
+              },
+              "to": {
+                "type": "string",
+                "example": "",
+                "description": "Recipient email address (required if Status is 'Approve')"
+              },
+              "subject": {
+                "type": "string",
+                "example": "Your Pass Request Approved",
+                "description": "Email subject (required if Status is 'Approve')"
+              },
+              "text": {
+                "type": "string",
+                "example": "Your pass request has been approved.",
+                "description": "Plain text content of the email"
+              },
+              "html": {
+                "type": "string",
+                "example": "<h1>Congratulations!</h1><p>Your pass request has been approved.</p>",
+                "description": "HTML content of the email"
+              }
+            },
+            "required": ["RequestId", "Status", "UserId"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "200": {
+        "description": "Request processed successfully",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Status updated successfully"
+                },
+                "Status": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "emailResponse": {
+                  "type": "string",
+                  "example": "250 2.0.0 OK",
+                  "description": "Response from the email service (if email was sent)"
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "Missing required fields"
+                },
+                "Status": {
+                  "type": "boolean",
+                  "example": false
+                }
+              }
+            }
+          }
+        }
+      }
+      
+    }
+  }
+  
+      },
+      "/api/auth/AttendeInActive": {
+        "get": {
+          "tags": ["Request Pass"],
+          "summary": "Make an Attendee Inactive",
+          "description": "Marks an attendee as inactive in the system based on their ID.",
+          "parameters": [
+            {
+              "name": "AttendeId",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "example": 1
+              },
+              "description": "The ID of the attendee to make inactive."
+            },
+            {
+              "name": "UserId",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "example": 1
+              },
+              "description": "The ID of the user performing the operation."
+            }
+          ]
+
+        }
+        
+
+      },
+      "/api/auth/QrCheckinOrCheckOut": {
+        "post": {
+          "tags": ["Check-In/Check-Out"],
+          "summary": "Update Check-In or Check-Out Time",
+          "description": "Updates the Check-In or Check-Out time (MeetingDate should be PresentDate).",
+          "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "OrgId": {
+                    "type": "integer",
+                    "example": 9333,
+                    "description": "The organization ID"
+                  },
+                  "IncNo": {
+                    "type": "string",
+                    "example": "REQ-1002",
+                    "description": "The unique incremental number for the request"
+                  },
+                  "UserId": {
+                    "type": "string",
+                    "example": "1",
+                    "description": "The user ID of the person performing the check-in or check-out"
+                  },
+                  "currentTime": {
+                    "type": "string",
+                    "example": "13:47:12",
+                    "description": "currenttime"
+                  }
+                },
+                "required": ["OrgId", "IncNo", "UserId", "currentTime"]
+              }
+            }
+          }
+          },
+          "responses": {
+            "200": {
+              "description": "Check-In/Check-Out time updated successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string",
+                        "example": "Check-in/out time updated successfully"
+                      },
+                      "time": {
+                        "type": "string",
+                        "example": "15:45:30",
+                        "description": "The time that was recorded"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          
+          }
+      }
+      }
+  
+    }
+}
+
+
+
+  
+
+
+
+      
+ 
+  
+  
