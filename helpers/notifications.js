@@ -10,7 +10,7 @@ class Notify {
                 service: "gmail",
                 auth: {
                     user: "pavansai.nittu@gmail.com",//"info@cooperwindindia.in",
-                    pass: "fgja gqyd jjdk ivmr"//"hgxv kbnt vuxp uwaz", // Your App Password
+                    pass: "fgja gqyd jjdk ivmr"//"hgxv kbnt vuxp uwaz", // App Password
                 },
             });
 
@@ -95,12 +95,12 @@ class Notify {
         try {
             console.log("Generating QR Code for Visitor ID:", Results.VisitorId);
             const qrCodeBuffer = await this.generateQRCode(Results.VisitorId); // Generate QR code
-
+            const subject = `${Results.Subject} 00${Results.VisitorId}`;
             await this.sendEmail(
                 Results.FromEmail,
                 [Results.NotifyEmail], // Convert to array
                 Results.CC, // No CC in this case, provide an empty array
-                Results.Subject,
+                subject,
                 Results.Text,
                 Results.Html,
                 [

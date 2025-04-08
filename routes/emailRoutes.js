@@ -803,7 +803,7 @@ router.get('/VMSDashboard', async (req, res) => {
          const TodayVisitorsCountsQuery = `
                  SELECT COUNT(VD.RequestId) AS  TodayVisitorsCountQUery   FROM dbo.VisitorsPass VP 
  INNER JOIN dbo.VisitorsDetails VD ON VD.RequestId = VP.RequestId
-        WHERE VP.OrgId = ${OrgId} AND CAST(MeetingDate AS DATE) = CAST(GETDATE() AS DATE) 
+        WHERE VP.OrgId = ${OrgId} AND VP.Status = 'APPROVED' AND CAST(MeetingDate AS DATE) = CAST(GETDATE() AS DATE) 
        `;
         const ContractorCountQuery = `
         select COUNT(*) AS ContractorCount from dbo.Contractor where OrgId = ${OrgId} AND IsActive = 1
@@ -823,7 +823,7 @@ router.get('/VMSDashboard', async (req, res) => {
         ORDER BY MONTH(Date); 
         `;
        
-
+        console.log(MonthWiseCLsCountQuery);
         const [
           
             TodayActiveLaborCheckIns,

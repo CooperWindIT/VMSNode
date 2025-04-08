@@ -62,6 +62,12 @@ pm2 stop mybackend     # Stop the service
 pm2 delete mybackend   # Remove from PM2
 
 
+DB_USER=admin
+DB_PASSWORD=vms123456
+DB_SERVER=vms2025.czyay66ssdpk.eu-north-1.rds.amazonaws.com
+DB_DATABASE=QAVMS1
+DB_PORT=1433
+
 DB_USER=sa
 DB_PASSWORD=sadguru
 DB_SERVER=DESKTOP-6J6FU6P/SQLEXPRESS

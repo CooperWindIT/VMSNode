@@ -33,7 +33,10 @@ function OperationEnums() {
         DELTROLMNU:31,
         DELTCLS:32,
         LBOURACTCHKINS:33,
-        VISITACTCHKINS:34
+        VISITACTCHKINS:34,
+        GETCHECKINVAL:35,
+        GETVALIDDAY:36,
+        UPDTCMNTS:37
     };
 
     return Operations;

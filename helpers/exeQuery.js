@@ -227,6 +227,29 @@ WHERE o.OrgId = ${JsonData.OrgId} AND NotifyName = 'MeetCanceled'`;
     }
     
     //Forgot Password
+    
+      //#region RandomCLS
+    GetRandomCLS(TotJson, callback) {
+        if (!TotJson) {
+            return callback(new Error('TotJson is undefined'));
+        }
+    
+        const { UserId } = TotJson;
+    
+        const sqlQuery = `
+            EXEC dbo.SP_GetRandomCLS
+                @UserId = '${UserId}'
+        `;
+    
+        console.log(sqlQuery); // Debugging purpose
+    
+        dbUtility.executeQuery(sqlQuery)
+            .then(results => callback(null, results))
+            .catch(callback);
+    }
+    
+    //#end region RandomCLS
+
 
 
 

@@ -34,27 +34,7 @@ try {
 });
 
 // Email Service
-router.post('/send-email', async (req, res) => {
-    const { to, subject, text, html } = req.body;
-    
-    // Email options
-    const mailOptions = {
-        from: '"Gireesh" <yaswanthpg9@gmail.com>', // Sender's name and email
-        to: to,                                     // Recipient email
-        subject: subject,                           // Email subject
-        text: text,                                 // Plain text body
-        html: html                                  // HTML body
-    };
 
-    try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent:', info.response);
-        res.status(200).json({ message: 'Email sent successfully', info: info.response });
-    } catch (error) {
-        console.error('Error while sending email:', error);
-        res.status(500).json({ message: 'Error while sending email', error: error.message });
-    }
-});
 
 
 //#region ManageLabourPass
@@ -154,5 +134,35 @@ router.get('/ActiveLAbourCheckIns', (req, res) => {
     handleRecord(req, res, data, OperationEnums().LBOURACTCHKINS);
 });
 
+
+router.get('/GetCheckInValidations', (req, res) => {
+    const data = req.query; 
+    handleRecord(req, res, data, OperationEnums().GETCHECKINVAL);
+});
+
+router.get('/GetValidDay', (req, res) => {
+    const data = req.query; 
+    handleRecord(req, res, data, OperationEnums().GETVALIDDAY);
+});
+
+router.post('/Updtcomments', async (req, res)=>{
+    const data = req.body;
+    handleRecord(req, res, data, OperationEnums().UPDTCMNTS);
+});
+
+router.post('/GetRandomCLS', async (req, res) => {
+    const data = req.body;
+    exeQuery.GetRandomCLS(data, (error, results) => {
+        if (error) {
+            return res.status(500).json({ error: error.message });
+        }
+        res.status(200).send(results);
+        if (results && results.length > 0) {
+           // Notify.OTPmail(results);
+        }
+        //res.status(200).json({ message: 'OTP Sent SuccessFul', Status: true });
+    });
+
+});
 
 module.exports = router;
