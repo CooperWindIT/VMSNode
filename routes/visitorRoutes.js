@@ -18,7 +18,11 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: "info@cooperwindindia.in", //"pavansai.nittu@gmail.com"
+<<<<<<< HEAD
         pass: "hgxv kbnt vuxp uwaz", //"fgja gqyd jjdk ivmr" Your App Password
+=======
+        pass: "hgxv kbnt vuxp uwaz", // "fgja gqyd jjdk ivmr" Your App Password
+>>>>>>> f132588428d604e07b3921a93731131d8fb35172
         //user: 'info@cooperwindindia.in', 
         //pass: 'hgxv kbnt vuxp uwaz'       // Your App Password
     }

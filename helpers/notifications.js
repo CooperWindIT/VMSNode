@@ -141,7 +141,7 @@ class Notify {
                 Results[0].EmpHtml
             );
         } else {
-            console.log("Skipping employee notification as EmpSubject is missing.");
+            console.log("Skipping employee notification as EmpSubject is missing.!");
         }
     }
     
