@@ -123,7 +123,7 @@ class Notify {
         // Send email to the visitor
         await this.sendEmail(
             Results[0].FromEmail, 
-            [Results[0].UserEmail],  
+            [Results[0].NotifyEmail],  
             Results[0].CC, 
             Results[0].Subject, 
             Results[0].Text, 
@@ -134,7 +134,7 @@ class Notify {
         if (Results[0].EmpSubject) {
             await this.sendEmail(
                 Results[0].FromEmail, 
-                [Results[0].NotifyEmail],  
+                [Results[0].UserEmail],  
                 Results[0].CC, 
                 Results[0].EmpSubject, 
                 Results[0].EmpText, 
