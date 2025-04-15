@@ -453,7 +453,7 @@ router.get('/ActiveVisitorCheckIns', (req, res) => {
 
 router.get('/ActiveVisitorCheckOuts', (req, res) => {
     const data = req.query; 
-    handleRecord(req, res, data, OperationEnums().VISITACTCHKINS);
+    handleRecord(req, res, data, OperationEnums().VISITACTCHKOUTS);
 });
 
 module.exports = router;
