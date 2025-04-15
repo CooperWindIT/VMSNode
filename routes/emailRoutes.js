@@ -86,6 +86,16 @@ try {
 }
 });
 
+router.get('/LogIn', (req, res) => {
+    const data = req.query; 
+    handleRecord(req, res, data, OperationEnums().LOGIN);
+});
+
+router.post('/LogOut', async (req, res) => {
+    const data = req.body;
+    handleRecord(req, res, data, OperationEnums().LOGOUT);
+});
+
 // router.post('/POSTUsers', async (req, res)=>{
 //     const data = req.body;
 //     const 
@@ -822,8 +832,14 @@ router.get('/VMSDashboard', async (req, res) => {
         GROUP BY DATENAME(MONTH, Date), MONTH(Date) 
         ORDER BY MONTH(Date); 
         `;
+        const TodayActiveVisitorsCheckOutsQuery = `
+        SELECT COUNT(VD.RequestId) AS TodayActiveVisitorsCheckins  FROM dbo.VisitorsPass VP 
+ INNER JOIN dbo.VisitorsDetails VD ON VD.RequestId = VP.RequestId
+        WHERE VP.OrgId = ${OrgId} AND CAST(MeetingDate AS DATE) = CAST(GETDATE() AS DATE) 
+        AND CheckInTime IS NOT NULL AND CheckOutTime IS NOT NULL;`;
+
        
-        console.log(MonthWiseCLsCountQuery);
+       
         const [
           
             TodayActiveLaborCheckIns,
@@ -831,14 +847,16 @@ router.get('/VMSDashboard', async (req, res) => {
             TodayActiveVisitorsCheckIns,
             ContractorCount,
             MonthWiseVisitorsCount,
-            MonthWiseCLsCount
+            MonthWiseCLsCount,
+            TodayActiveVisitorsCheckOuts
         ] = await Promise.all([ 
             dbUtility.executeQuery(TodayActiveLaborCheckInsQuery),
             dbUtility.executeQuery(TodayVisitorsCountsQuery),
             dbUtility.executeQuery(TodayActiveVisitorsCheckInsQuery ),
             dbUtility.executeQuery(ContractorCountQuery),
             dbUtility.executeQuery(MonthWiseVisitorsCountQuery),
-            dbUtility.executeQuery(MonthWiseCLsCountQuery)
+            dbUtility.executeQuery(MonthWiseCLsCountQuery),
+            dbUtility.executeQuery(TodayActiveVisitorsCheckOutsQuery)
             
            
         ]);
@@ -848,7 +866,8 @@ router.get('/VMSDashboard', async (req, res) => {
             TodayActiveVisitorsCheckIns,
             ContractorCount,
             MonthWiseVisitorsCount,
-            MonthWiseCLsCount
+            MonthWiseCLsCount,
+            TodayActiveVisitorsCheckOuts
         });
     } catch (err) {
         res.status(500).json({ error: err.message });

@@ -17,10 +17,8 @@ router.use(express.json());
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: "info@cooperwindindia.in", //"pavansai.nittu@gmail.com"
-        pass: "hgxv kbnt vuxp uwaz", //"fgja gqyd jjdk ivmr" Your App Password
-
-        pass: "hgxv kbnt vuxp uwaz", // "fgja gqyd jjdk ivmr" Your App Password
+        user: "pavansai.nittu@gmail.com",//"info@cooperwindindia.in",
+        pass: "fgja gqyd jjdk ivmr"//"hgxv kbnt vuxp uwaz", // Your App Password
         //user: 'info@cooperwindindia.in', 
         //pass: 'hgxv kbnt vuxp uwaz'       // Your App Password
     }
@@ -453,5 +451,9 @@ router.get('/ActiveVisitorCheckIns', (req, res) => {
 });
 
 
+router.get('/ActiveVisitorCheckOuts', (req, res) => {
+    const data = req.query; 
+    handleRecord(req, res, data, OperationEnums().VISITACTCHKINS);
+});
 
 module.exports = router;

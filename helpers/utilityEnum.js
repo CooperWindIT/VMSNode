@@ -36,7 +36,10 @@ function OperationEnums() {
         VISITACTCHKINS:34,
         GETCHECKINVAL:35,
         GETVALIDDAY:36,
-        UPDTCMNTS:37
+        UPDTCMNTS:37,
+        LOGIN:38,
+        LOGOUT:39,
+        VISITACTCHKOUTS:40
     };
 
     return Operations;
