@@ -39,7 +39,8 @@ function OperationEnums() {
         UPDTCMNTS:37,
         LOGIN:38,
         LOGOUT:39,
-        VISITACTCHKOUTS:40
+        VISITACTCHKOUTS:40,
+         TODAYVISITS:41
     };
 
     return Operations;
