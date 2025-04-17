@@ -17,7 +17,7 @@ router.use(express.json());
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: "pavansai.nittu@gmail.com",//"info@cooperwindindia.in",
+        user: "info@cooperwindindia.in", //"pavansai.nittu@gmail.com",
         pass: "fgja gqyd jjdk ivmr"//"hgxv kbnt vuxp uwaz", // Your App Password
         //user: 'info@cooperwindindia.in', 
         //pass: 'hgxv kbnt vuxp uwaz'       // Your App Password
@@ -172,7 +172,10 @@ router.get('/getReqPassById', (req, res) => {
     const data = req.query; 
     handleRecord(req, res, data, OperationEnums().GETREQPASSBYID);
 });
-
+router.get('/TodayVisits', (req, res) => {
+    const data = req.query; 
+    handleRecord(req, res, data, OperationEnums().TODAYVISITS);
+});
 
 router.post('/MOMSubmit', async (req, res) => {
     const data = req.body;
@@ -316,6 +319,96 @@ router.get('/PassApproval', async (req, res) => {
 });
 
 
+//region MailApprove&reject
+router.get('/MailPassApproval', async (req, res) => {
+    try {
+        const { RequestId, OrgId, UserId } = req.query;
+
+        if (!RequestId || !OrgId || !UserId) {
+            return res.status(204).end(); // No Content
+        }
+
+        exeQuery.SpGetNotificationDetails({ RequestId, OrgId, UserId }, async (error, results) => {
+            if (error) {
+                console.error('DB Error:', error.message);
+                return res.status(204).end(); // No Content
+            }
+
+            try {
+                if (results.length > 0) {
+                    await Promise.all(results.map((result) => Notify.MailToVisitors(result)));
+                    console.log('Emails sent successfully');
+                }
+            } catch (mailError) {
+                console.error('Mail Error:', mailError);
+            }
+            console.log('HAI');
+            //return res.status(204).end(); // ✅ End response silently
+            return res.send(`
+                <html>
+                  <body style="font-family: Arial; padding: 20px; text-align: center;">
+                    <h2>Pass Approved Successful</h2>
+                    <p>Kindly you can close this tab.</p>
+                  </body>
+                </html>
+              `);
+              
+        });
+
+    } catch (error) {
+        console.error('Unexpected Error:', error.message);
+        return res.status(204).end(); // Still respond silently
+    }
+});
+
+router.get('/MailRejectPass', async (req, res) => {
+    try {
+        const { RequestId, OrgId, UpdatedBy } = req.query;
+
+        if (!RequestId || !UpdatedBy) {
+            return res.send(`
+              <html>
+                <body style="font-family: Arial; padding: 20px;">
+                  <h2>Invalid Request</h2>
+                  <p>Missing required parameters.</p>
+                </body>
+              </html>
+            `);
+        }
+
+        const updateQuery = `
+            UPDATE dbo.VisitorsPass 
+            SET Status = 'REJECTED', 
+                UpdatedBy = '${UpdatedBy}', 
+                UpdatedOn = dbo.GetISTTime() 
+            WHERE RequestId = '${RequestId}';
+        `;
+
+        await dbUtility.executeQuery(updateQuery);
+
+        // ✅ Response page after rejection
+        return res.send(`
+          <html>
+            <body style="font-family: Arial; padding: 20px; text-align: center;">
+              <h2>Pass Rejected Successful</h2>
+              <p>Kindly close this tab.</p>
+            </body>
+          </html>
+        `);
+
+    } catch (error) {
+        console.error('RejectPass Error:', error.message);
+        return res.send(`
+          <html>
+            <body style="font-family: Arial; padding: 20px;">
+              <h2>Error</h2>
+              <p>Something went wrong while rejecting the pass.</p>
+            </body>
+          </html>
+        `);
+    }
+});
+//#endregion MailApprove&reject
 
 router.get('/RejectPass', (req, res) => {
     const data = req.query; 
