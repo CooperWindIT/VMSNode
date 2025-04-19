@@ -38,6 +38,22 @@ class Notify {
         }
     }
 
+    async MomSubmit(data) {
+        try {
+            await this.sendEmail(
+                data.FromEmail,
+                [data.ToEmail],
+                data.CC ? [data.CC] : [],
+                data.Subject,
+                data.Text,
+                data.Html,
+                data.Attachments
+            );
+        } catch (error) {
+            console.error("Error in MailToMomSubmit:", error);
+        }
+    }
+
     // Function to send email to the manager
     async MailToManager(Results) {
         console.log(Results[0].NotifyEmail);
@@ -95,7 +111,7 @@ class Notify {
         try {
             console.log("Generating QR Code for Visitor ID:", Results.VisitorId);
             const qrCodeBuffer = await this.generateQRCode(Results.VisitorId); // Generate QR code
-            const subject = `${Results.Subject} 00${Results.VisitorId}`;
+            const subject = `${Results.Subject} ${Results.VisitorId}`;
             await this.sendEmail(
                 Results.FromEmail,
                 [Results.NotifyEmail], // Convert to array

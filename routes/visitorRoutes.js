@@ -177,98 +177,156 @@ router.get('/TodayVisits', (req, res) => {
     handleRecord(req, res, data, OperationEnums().TODAYVISITS);
 });
 
-router.post('/MOMSubmit', async (req, res) => {
-    const data = req.body;
+// router.post('/MOMSubmit', async (req, res) => {
+//     const data = req.body;
+//     const { MOM, RequestId, UpdatedBy } = req.body;
+
+//     if (!MOM || !RequestId || !UpdatedBy) {
+//         return res.status(400).json({ message: 'Missing required fields' });
+//     }
+
+//     // SQL query to update MOM and Status in the database
+//     const updateMOMQuery = `
+//         UPDATE dbo.VisitorsPass 
+//         SET MOM = '${MOM}', 
+//             Status = 'COMPLETED', 
+//             UpdatedBy = '${UpdatedBy}', 
+//             UpdatedOn = dbo.GetISTTime()
+//         WHERE RequestId = '${RequestId}';
+//     `;
+
+//     try {
+//         const rowsAffected = await dbUtility.executeQueryrowsAffected(updateMOMQuery);
+//         console.log(rowsAffected);
+//         // Check if any rows were affected (i.e., update was successful)
+//         if (rowsAffected > 0) {
+//             res.status(200).json({
+//                 message: 'MOM Updated successfully. Emails will be sent shortly.',
+//                 Status: true
+//             });
+//             console.log('HI');
+//             // Email sending logic in the background
+//             setImmediate(async () => {
+//                 try {
+                   
+//                     const GetPassQuery = `
+//                         SELECT * FROM dbo.VisitorsDetails WHERE RequestId = '${RequestId}'
+//                     `;
+//                     console.log(GetPassQuery);
+//                     const records = await dbUtility.executeQuery(GetPassQuery);
+                
+//                     if (records.length > 0) {
+//                         for (const record of records) {
+//                             //console.log(record[0].Email);
+//                             if (record.Email) {
+//                                 const to = record.Email;
+//                                 const Passno = record.AutoIncNo;
+//                                 const subject = `MOM Submission`;
+//                                 const text = `MOM submission`;
+//                                 const html = `
+//                                     <p>MOM Submission,</p>
+//                                     <p>${MOM}.</p>
+//                                     <p>Thank you,</p>
+//                                     <p>VMS Cooperwind</p>
+//                                 `;
+
+//                                 const mailOptions = {
+//                                     from: '"CWI" <info@cooperwindindia.in>', // Sender's name and email
+//                                     to: to,
+//                                     subject: subject,
+//                                     text: text,
+//                                     html: html
+//                                 };
+
+//                                 // Send the email
+//                                 const info = await transporter.sendMail(mailOptions);
+//                                 console.log(`Email sent to ${to}:`, info.response);
+//                             } else {
+//                                 console.warn('No email found for RequestId:', RequestId);
+//                             }
+//                         }
+//                     } else {
+//                         console.warn('No records found for RequestId:', RequestId);
+//                     }
+//                 } catch (error) {
+//                     console.error('Error while fetching records or sending emails:', error);
+//                 }
+//             });
+//         } else {
+//             res.status(200).json({
+//                 message: 'MOM not updated, no emails will be sent',
+//                 Status: false
+//             });
+//         }
+//     } catch (error) {
+//         console.error('Error while updating MOM:', error);
+//         res.status(500).json({
+//             message: 'Error while updating MOM',
+//             Status: false,
+//             error: error.message
+//         });
+//     }
+// });
+
+router.post('/MOMSubmitwithAttachment', upload.single('Attachment'), async (req, res) => {
     const { MOM, RequestId, UpdatedBy } = req.body;
+    const file = req.file;
 
     if (!MOM || !RequestId || !UpdatedBy) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    // SQL query to update MOM and Status in the database
-    const updateMOMQuery = `
-        UPDATE dbo.VisitorsPass 
-        SET MOM = '${MOM}', 
-            Status = 'COMPLETED', 
-            UpdatedBy = '${UpdatedBy}', 
-            UpdatedOn = dbo.GetISTTime()
-        WHERE RequestId = '${RequestId}';
-    `;
-
     try {
-        const rowsAffected = await dbUtility.executeQueryrowsAffected(updateMOMQuery);
-        console.log(rowsAffected);
-        // Check if any rows were affected (i.e., update was successful)
-        if (rowsAffected > 0) {
-            res.status(200).json({
-                message: 'MOM Updated successfully. Emails will be sent shortly.',
-                Status: true
-            });
-            console.log('HI');
-            // Email sending logic in the background
-            setImmediate(async () => {
-                try {
-                   
-                    const GetPassQuery = `
-                        SELECT * FROM dbo.VisitorsDetails WHERE RequestId = '${RequestId}'
-                    `;
-                    console.log(GetPassQuery);
-                    const records = await dbUtility.executeQuery(GetPassQuery);
-                
-                    if (records.length > 0) {
-                        for (const record of records) {
-                            //console.log(record[0].Email);
-                            if (record.Email) {
-                                const to = record.Email;
-                                const Passno = record.AutoIncNo;
-                                const subject = `MOM Submission`;
-                                const text = `MOM submission`;
-                                const html = `
-                                    <p>MOM Submission,</p>
-                                    <p>${MOM}.</p>
-                                    <p>Thank you,</p>
-                                    <p>VMS Cooperwind</p>
-                                `;
+        // Step 1: Update MOM in VisitorsPass table
+        const updateMOMQuery = `
+            UPDATE dbo.VisitorsPass 
+            SET MOM = '${MOM}', 
+                Status = 'COMPLETED', 
+                UpdatedBy = '${UpdatedBy}', 
+                UpdatedOn = dbo.GetISTTime()
+            WHERE RequestId = '${RequestId}';
+        `;
+        await dbUtility.executeQueryrowsAffected(updateMOMQuery);
 
-                                const mailOptions = {
-                                    from: '"CWI" <info@cooperwindindia.in>', // Sender's name and email
-                                    to: to,
-                                    subject: subject,
-                                    text: text,
-                                    html: html
-                                };
+        // Step 2: Get all visitors under this RequestId
+        const GetPassQuery = `SELECT * FROM dbo.VisitorsDetails WHERE RequestId = '${RequestId}'`;
+        const visitors = await dbUtility.executeQuery(GetPassQuery);
 
-                                // Send the email
-                                const info = await transporter.sendMail(mailOptions);
-                                console.log(`Email sent to ${to}:`, info.response);
-                            } else {
-                                console.warn('No email found for RequestId:', RequestId);
-                            }
-                        }
-                    } else {
-                        console.warn('No records found for RequestId:', RequestId);
-                    }
-                } catch (error) {
-                    console.error('Error while fetching records or sending emails:', error);
+        // Step 3: Loop through all visitors and send email to each
+        for (const visitor of visitors) {
+            if (visitor.Email) {
+                const emailData = {
+                    FromEmail: 'info@cooperwindindia.in',
+                    ToEmail: visitor.Email,
+                    CC: '', // Optional
+                    Subject: `MOM Submission`,
+                    Text: `MOM has been submitted.`,
+                    Html: `
+                        <p>Hello ${visitor.Name || ''},</p>
+                        <p>The following MOM has been submitted:</p>
+                        <p>${MOM}</p>
+                        <p>Regards,<br>CWI Team</p>
+                    `,
+                    Attachments: [],
+                };
+
+                if (file) {
+                    emailData.Attachments.push({
+                        filename: file.originalname,
+                        path: file.path
+                    });
                 }
-            });
-        } else {
-            res.status(200).json({
-                message: 'MOM not updated, no emails will be sent',
-                Status: false
-            });
+
+                await Notify.MomSubmit(emailData); // Send mail to each visitor
+            }
         }
+
+        return res.status(200).json({ message: 'MOM submitted and emails sent to all visitors.' });
     } catch (error) {
-        console.error('Error while updating MOM:', error);
-        res.status(500).json({
-            message: 'Error while updating MOM',
-            Status: false,
-            error: error.message
-        });
+        console.error('Error in /MOMSubmitwithAttachment:', error);
+        return res.status(500).json({ message: 'Internal server error' });
     }
 });
-
-
 
 router.post('/AttendeInActive', async (req, res) => {
     const data = req.body; 
