@@ -287,6 +287,7 @@ router.post('/MOMSubmitwithAttachment', upload.single('Attachment'), async (req,
             WHERE RequestId = '${RequestId}';
         `;
         await dbUtility.executeQueryrowsAffected(updateMOMQuery);
+        res.status(200).json({ message: 'MOM submitted.' });
 
         // Step 2: Get all visitors under this RequestId
         const GetPassQuery = `SELECT * FROM dbo.VisitorsDetails WHERE RequestId = '${RequestId}'`;
@@ -321,7 +322,8 @@ router.post('/MOMSubmitwithAttachment', upload.single('Attachment'), async (req,
             }
         }
 
-        return res.status(200).json({ message: 'MOM submitted and emails sent to all visitors.' });
+        // return res.status(200).json({ message: 'MOM submitted and emails sent to all visitors.' });
+        
     } catch (error) {
         console.error('Error in /MOMSubmitwithAttachment:', error);
         return res.status(500).json({ message: 'Internal server error' });
