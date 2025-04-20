@@ -135,6 +135,26 @@ WHERE o.OrgId = ${JsonData.OrgId} AND NotifyName = 'MeetCanceled'`;
     }
     //#endregion ManageRequestPass
 
+    //#region AadharChecKIns
+    SpManageAadharChecKIns(TotJson, callback) {
+        if (!TotJson) {
+            return callback(new Error('TotJson is undefined'));
+        }
+        const { orgid, userid, ContractorId, AadharNo  } = TotJson;
+        const sqlQuery = `
+             EXEC [dbo].[SP_AadharCheckIns]
+                @ContractorId = '${ContractorId}',
+                @AadharNo = '${AadharNo}',
+                @OrgId = '${orgid}',
+                @CreatedBy = '${userid}';
+        `;
+        console.log(sqlQuery);
+        dbUtility.executeQuery(sqlQuery)
+            .then(results => callback(null, results))
+            .catch(callback);
+    }
+    //#endregion AadharChecKIns
+
      //#region ManageVisitorsPass
      SpManageVisitorsPass(TotJson, callback) {
         if (!TotJson) {
