@@ -35,7 +35,23 @@ try {
 
 // Email Service
 
+//#region AadharCheckIns
 
+router.post('/AadharCheckIns', async (req, res) => {
+    try {
+        exeQuery.SpManageAadharChecKIns(req.body, (error, results) => {
+            if (error) {
+                return res.status(400).send({ error: error.message });
+            }
+            // Send response first
+            res.status(200).send(results);
+        });
+    } catch (error) {
+        res.status(400).send({ error: error.message });
+    }
+});
+
+//#end region AadharCheckIns
 
 //#region ManageLabourPass
 router.post('/ManageCasualLabours', async (req, res) => {
