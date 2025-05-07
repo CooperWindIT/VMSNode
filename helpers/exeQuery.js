@@ -203,6 +203,7 @@ WHERE o.OrgId = ${JsonData.OrgId} AND NotifyName = 'MeetCanceled'`;
             .then(results => callback(null, results))
             .catch(callback);
     }
+    
     //#endregion ManageCasualLabours
 
     //#region SpGetNotificationDetails
