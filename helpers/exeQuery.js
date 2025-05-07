@@ -187,15 +187,17 @@ WHERE o.OrgId = ${JsonData.OrgId} AND NotifyName = 'MeetCanceled'`;
             return callback(new Error('TotJson is undefined'));
         }
     
-        const { orgid, userid, CasualLabourData } = TotJson;
-        const CasualLabourDataJSON = JSON.stringify(CasualLabourData);
+        const { orgid, userid, Operation, CLCounts } = TotJson;
+        const CLCountsJSON = JSON.stringify(CLCounts);
     
         const sqlQuery = `
-            EXEC [dbo].[SP_ManageCasualLabours]
-                @orgid = '${orgid}',
-                @userid = '${userid}',
-                @CasualLabourData = N'${CasualLabourDataJSON.replace(/'/g, "''")}'
-        `;
+    EXEC [dbo].[SP_ManageCLCount]
+        @OrgId = ${orgid},
+        @UserId = ${userid},
+        @Operation = '${Operation}',
+        @CLCounts = N'${CLCountsJSON.replace(/'/g, "''")}'
+`;
+
         console.log(sqlQuery);
         dbUtility.executeQuery(sqlQuery)
             .then(results => callback(null, results))
