@@ -8,7 +8,8 @@ const Notify = require('../helpers/notifications.js');
 const exeQuery = require('../helpers/exeQuery');
 const dbUtility = require('../dbUtility');
 const { Console } = require('winston/lib/winston/transports/index.js');
-
+const cors = require('cors'); // if not already imported
+router.use(cors());    
 const upload = multer({ dest: 'uploads/' }); 
 router.use(express.json());
 
