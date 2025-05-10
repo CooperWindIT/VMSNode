@@ -84,21 +84,28 @@ router.get('/getReqPass', (req, res) => {
     const data = req.query; 
     handleRecord(req, res, data, OperationEnums().GETREQPASS);
 });
+
 //#region filter service
 router.post('/getReqPasswithFilters', async (req, res) => {
     try {
         // Destructuring parameters from the request body
         const { OrgId, FromDate, ToDate, VisitorType, Status, AutoIncNo, UserId, RoleId } = req.body;
 
+           const updateQuery = `
+            UPDATE dbo.VisitorsPass
+                SET IsActive = 0
+            WHERE Status = 'APPROVED'
+            AND CAST(MeetingDate AS DATE) < CAST(dbo.GetISTTime() AS DATE) AND OrgId=${OrgId};
+        `;
+        console.log(updateQuery);
+        
+        await dbUtility.executeQuery(updateQuery);
         // Validate OrgId
         if (!OrgId) {
             return res.status(400).json({ message: 'OrgId is required', Status: false });
         }
 
-        // Start building the query string
-    //     SELECT RequestId,  RequestDate, CAST(MeetingDate AS DATE) AS MeetingDate,MeetingTime,
-    //     VisitorType, Status, AutoIncNo,  Remarks 
-    //    FROM dbo.VisitorsPass 
+    
         let query = `
            SELECT 
     VP.RequestId,  

@@ -6,6 +6,7 @@ const { OperationEnums } = require('../helpers/utilityEnum.js');
 const exeQuery = require('../helpers/exeQuery');
 const dbUtility = require('../dbUtility');
 const { Console } = require('winston/lib/winston/transports/index.js');
+const Notify = require('../helpers/notifications.js');
 
 
 router.use(express.json());
@@ -22,19 +23,6 @@ const transporter = nodemailer.createTransport({
 
 
 
-router.get('/SignIn', (req, res) => {
-try {
-    const data = req.query;
-    console.log(data);
-    handleRecord(req, res, data, OperationEnums().SIGNIN);
-} catch (error) {
-    console.error('Error:', error.message);
-    res.status(500).json({ error: 'Error While SIGNIN' });
-}
-});
-
-// Email Service
-
 //#region AadharCheckIns
 
 router.post('/AadharCheckIns', async (req, res) => {
@@ -50,24 +38,31 @@ router.post('/AadharCheckIns', async (req, res) => {
         res.status(400).send({ error: error.message });
     }
 });
+router.get('/getAadharCheckIns', (req, res) => {
+    const data = req.query; 
+    handleRecord(req, res, data, OperationEnums().AADHARCHECKINS);
+});
+
 
 //#end region AadharCheckIns
 
-//#region ManageLabourPass
-router.post('/ManageCasualLabours', async (req, res) => {
-    try {
-        // Validate request body
-        if (!req.body || !req.body.orgid || !req.body.userid  || !req.body.CasualLabourData) {
-            return res.status(400).send({ error: 'Missing required parameters' });
-        }
 
-        exeQuery.SpManageCasualLabours(req.body, (error, results) => {
+//#region ManageLabourPass
+router.post('/ManageCLCount', async (req, res) => {
+    try {
+        exeQuery.SPManageCLCount(req.body, (error, results) => {
             if (error) {
                 return res.status(400).send({ error: error.message });
             }
 
             // Send response first
             res.status(200).send(results);
+            console.log(results[0].Success);
+            if (results[0].Success === 1) {
+                console.log(results);
+                Notify.MailToManager(results);
+            }
+                       
         });
 
     } catch (error) {
@@ -91,17 +86,8 @@ router.get('/getContractors', (req, res) => {
     handleRecord(req, res, data, OperationEnums().GETCONTRACT);
 });
 
-router.post('/POSTCasualLabors', async (req, res)=>{
-    const data = req.body;
-    handleRecord(req, res, data, OperationEnums().INSRTCLS);
-});
 
-router.post('/UPDTCasualLabors', async (req, res)=>{
-    const data = req.body;
-    handleRecord(req, res, data, OperationEnums().UPDTCLS);
-});
-
-router.post('/InactiveLabors', async (req, res)=>{
+router.post('/InactiveCLDate', async (req, res)=>{
     const data = req.body;
     console.log(data);
     handleRecord(req, res, data, OperationEnums().DELTCLS);
@@ -131,7 +117,7 @@ router.post('/LaborCheckOut', async (req, res)=>{
     const data = req.body;
     handleRecord(req, res, data, OperationEnums().QRCHECKOUT);
 });
-router.get('/getCasualLabours', (req, res) => {
+router.get('/getCLSCountByContractorId', (req, res) => {
     const data = req.query; 
     handleRecord(req, res, data, OperationEnums().GETCLS);
 });

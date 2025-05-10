@@ -22,14 +22,14 @@ function OperationEnums() {
         RSECURSEL:20,
         GETREPORTHEAD:21,
         LABORCHECKINS: 22,
-        FRGTPASWRD:23,
+        CHNGPSWD:23,
         GETDEPT:24,
         REJECT:25,
         GETMANAGER:26,
         INSRTCLS:27,
         UPDTCLS:28,
         GETCLS:29,
-        GetCLSById:30,
+        AADHARCHECKINS:30,
         DELTROLMNU:31,
         DELTCLS:32,
         LBOURACTCHKINS:33,
@@ -40,7 +40,7 @@ function OperationEnums() {
         LOGIN:38,
         LOGOUT:39,
         VISITACTCHKOUTS:40,
-         TODAYVISITS:41
+        TODAYVISITS:41
     };
 
     return Operations;

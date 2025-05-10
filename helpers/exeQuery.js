@@ -136,6 +136,7 @@ WHERE o.OrgId = ${JsonData.OrgId} AND NotifyName = 'MeetCanceled'`;
     //#endregion ManageRequestPass
 
     //#region AadharChecKIns
+    //#region AadharChecKIns
     SpManageAadharChecKIns(TotJson, callback) {
         if (!TotJson) {
             return callback(new Error('TotJson is undefined'));
@@ -153,6 +154,7 @@ WHERE o.OrgId = ${JsonData.OrgId} AND NotifyName = 'MeetCanceled'`;
             .then(results => callback(null, results))
             .catch(callback);
     }
+    //#endregion AadharChecKIns
     //#endregion AadharChecKIns
 
      //#region ManageVisitorsPass
@@ -182,20 +184,21 @@ WHERE o.OrgId = ${JsonData.OrgId} AND NotifyName = 'MeetCanceled'`;
 
     
      //#region ManageCasualLabours
-    SpManageCasualLabours(TotJson, callback) {
+    //#region ManageCLCount
+    SPManageCLCount(TotJson, callback) {
         if (!TotJson) {
             return callback(new Error('TotJson is undefined'));
         }
     
-        const { orgid, userid, Operation, CLCounts } = TotJson;
-        const CLCountsJSON = JSON.stringify(CLCounts);
+        const { orgid, userid, ContractorId, CLCountData } = TotJson;
+        const CLCountsJSON = JSON.stringify(CLCountData);
     
         const sqlQuery = `
     EXEC [dbo].[SP_ManageCLCount]
         @OrgId = ${orgid},
         @UserId = ${userid},
-        @Operation = '${Operation}',
-        @CLCounts = N'${CLCountsJSON.replace(/'/g, "''")}'
+        @ContractorId = '${ContractorId}',
+        @CLCountData = N'${CLCountsJSON.replace(/'/g, "''")}'
 `;
 
         console.log(sqlQuery);
@@ -203,6 +206,7 @@ WHERE o.OrgId = ${JsonData.OrgId} AND NotifyName = 'MeetCanceled'`;
             .then(results => callback(null, results))
             .catch(callback);
     }
+    //#endregion ManageCLCount
     //#endregion ManageCasualLabours
 
     //#region SpGetNotificationDetails

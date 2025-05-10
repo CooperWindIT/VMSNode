@@ -263,7 +263,10 @@ router.post('/getReqPasswithFilters', async (req, res) => {
 });
 
 
-
+router.post('/ChangePassword', async (req, res)=>{
+    const data = req.body;
+    handleRecord(req, res, data, OperationEnums().FRGTPASWRD);
+});
 
 router.get('/getReqPassById', (req, res) => {
     const data = req.query; 
