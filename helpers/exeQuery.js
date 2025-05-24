@@ -377,6 +377,25 @@ WHERE o.OrgId = ${JsonData.OrgId} AND NotifyName = 'MeetCanceled'`;
             .then(results => callback(null, results))
             .catch(callback);
     }
+
+    GetDailyCheckinSummary(params, callback) {
+    if (!params || !params.OrgId) {
+        return callback(new Error('OrgId is required'));
+    }
+
+    const { OrgId } = params;
+
+    const sqlQuery = `
+        EXEC [dbo].[SP_GetDailyCheckinSummary]
+            @OrgId = ${OrgId}
+    `;
+
+    console.log(sqlQuery); // Debugging purpose
+
+    dbUtility.executeQuery(sqlQuery)
+        .then(results => callback(null, results))
+        .catch(callback);
+}
    
 
 
