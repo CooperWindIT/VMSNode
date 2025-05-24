@@ -604,7 +604,23 @@ router.post('/ConfirmOTP', async (req, res) => {
 });
 
 
+router.get('/daily-checkins-summary', async (req, res) => {
+  const { OrgId } = req.query;
 
+  if (!OrgId) {
+    return res.status(400).json({ error: 'OrgId query parameter is required' });
+  }
+
+  exeQuery.GetDailyCheckinSummary({ OrgId }, (error, results) => {
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+    res.status(200).json({ message: 'Daily check-in summary processed', status: true });
+    Notify.OTPmail(results);
+    //res.status(200).send(results);
+    
+  });
+});
 
 
 
