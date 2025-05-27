@@ -58,10 +58,10 @@ router.post('/ManageCLCount', async (req, res) => {
             // Send response first
             res.status(200).send(results);
             console.log(results[0].Success);
-            if (results[0].Success === 1) {
-                console.log(results);
-                Notify.MailToManager(results);
-            }
+            // if (results[0].Success === 1) {
+            //     console.log(results);
+            //     Notify.MailToManager(results);
+            // }
                        
         });
 
